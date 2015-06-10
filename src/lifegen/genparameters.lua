@@ -11,7 +11,7 @@ function NGenLifeParams:new(o)
   return o
 end
 
---- Naming rule for namgegen-life.
+--- Naming rule for namegen-life.
 -- @type LifeNamingRule
 LifeNamingRule = {}
 
@@ -46,5 +46,19 @@ end
 -- The 1.2 is discarded by 1.1 and 1.1 by 2.2 etc...
 LifeNamingRule.patterns = {}
 
+--- Priority of the naming rule.
+-- Default is 0. Values lower than that are more important, higher less.
+-- Used naming rule is randomized, and higher priority means higher change
+-- to get used. Rule with lowest priority has always change to appear unless
+-- NGenLifeParams.maxPriorityDifference is 1.
+LifeNamingRule.priority = 0
+
 --- List of naming rules.
 NGenLifeParams.namingRules = {}
+
+--- Max priority difference between lowest and highest priority.
+NGenLifeParams.maxPriorityDifference = 0.9
+
+function NGenLifeParams:addRule(rule)
+  table.insert(self.namingRules, rule)
+end
