@@ -48,16 +48,35 @@ LifeNamingRule.patterns = {}
 
 --- Priority of the naming rule.
 -- Default is 0. Values lower than that are more important, higher less.
--- Used naming rule is randomized, and higher priority means higher change
--- to get used. Rule with lowest priority has always change to appear unless
--- NGenLifeParams.maxPriorityDifference is 1.
+-- If every rule works together, priority is ignored... But if it does not,
+-- rule with highest priority (=lowest value) is used with every other rule
+-- possible.
 LifeNamingRule.priority = 0
+
+--- Relations with other rules.
+-- The key is name of rule to apply modifiers. It supports wildcards * and ? as
+-- in general regular expressions.
+-- 
+-- The value is table of string keys that specify how this rule is compatible
+-- with rule(s) specified in keys. Each key is started with plus (+) or
+-- minus (-), and that character defines whether to disable or enable rule.
+-- Some rules may take parameters, which are separated from the main rule
+-- using space.
+-- 
+-- Possible rules:
+-- <ul>
+-- <li>everything: Rules may used together in <b>every</b> case. Be careful 
+-- when using this, updates may change behaviour in weird ways
+-- (unless minus, which is perfectly ok, but useless usually)
+-- <li>separate: Rules may used in different parts of same name 
+-- (e.g. first name and surname).
+-- <li>same <firstname/lastname>: Rules may used in same parts of name.
+-- </ul>
+LifeNamingRule.relations = {}
+LifeNamingRule.relations["*"] = {"+separate"}
 
 --- List of naming rules.
 NGenLifeParams.namingRules = {}
-
---- Max priority difference between lowest and highest priority.
-NGenLifeParams.maxPriorityDifference = 0.9
 
 function NGenLifeParams:addRule(rule)
   table.insert(self.namingRules, rule)
