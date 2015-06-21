@@ -34,16 +34,7 @@ end
 -- the pattern is marked as possible, if not it is immediately rejected.
 -- 
 -- If there is only one pattern left, it will be used as next for the name. If
--- there is multiple ones, the generator will check which has lowest change to
--- appear and <b>chooses it</b>. If there is multiple patterns with that low
--- change, others will rejected and the generator will randomly choose one of
--- them.
--- 
--- There is also special case, if one wants to manually assign changes.
--- If the change is not between 0-1, it will be treated differently when
--- discarding patterns by that probability value. The bigger the number is, the
--- higher priority the number has: 0.1 discards 0.2, but is discarded by 1.2.
--- The 1.2 is discarded by 1.1 and 1.1 by 2.2 etc...
+-- there is multiple ones, the NGenLifeParams.chooseMethod defines the behavior.
 LifeNamingRule.patterns = {}
 
 --- Priority of the naming rule.
@@ -66,7 +57,7 @@ LifeNamingRule.priority = 0
 -- Possible rules:
 -- <ul>
 -- <li>everything: Rules may used together in <b>every</b> case. Be careful 
--- when using this, updates may change behaviour in weird ways
+-- when using this, updates may change behavior in weird ways
 -- (unless minus, which is perfectly ok, but useless usually)
 -- <li>separate: Rules may used in different parts of same name 
 -- (e.g. first name and surname).
@@ -77,6 +68,25 @@ LifeNamingRule.relations["*"] = {"+separate"}
 
 --- List of naming rules.
 NGenLifeParams.namingRules = {}
+
+--- Method used for choosing pattern.
+-- <b>buffRare:</b> (TODO needs implementation)
+-- 
+-- The generator will check which has lowest change to
+-- appear and <b>chooses it</b>. If there is multiple patterns with that low
+-- change, others will rejected and the generator will randomly choose one of
+-- them.
+-- 
+-- There is also special case, if one wants to manually assign changes.
+-- If the change is not between 0-1, it will be treated differently when
+-- discarding patterns by that probability value. The bigger the number is, the
+-- higher priority the number has: 0.1 discards 0.2, but is discarded by 1.2.
+-- The 1.2 is discarded by 1.1 and 1.1 by 2.2 etc...
+-- 
+-- <b>preciseMatch:</b>
+-- The generator will loop through possible patterns until there is
+-- only one left. It may have impact on performance.
+NGenLifeParams.chooseMethod = "preciseMatch"
 
 function NGenLifeParams:addRule(rule)
   table.insert(self.namingRules, rule)

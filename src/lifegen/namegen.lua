@@ -17,5 +17,7 @@ end
 NameGenLife.params = NGenLifeParams:new()
 
 function NameGenLife:createName(params)
+  params = params or self.params -- Assign params from self if not provided or nil
   
+  local rules = checkPossibleRules(params.namingRules)
 end
