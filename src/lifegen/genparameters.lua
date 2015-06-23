@@ -66,6 +66,21 @@ LifeNamingRule.priority = 0
 LifeNamingRule.relations = {}
 LifeNamingRule.relations["*"] = {"+separate"}
 
+function LifeNamingRule:read(string)
+  local lines = self.split(string,"\n")
+end
+
+function LifeNamingRule.split(string,sep)
+  local function split(string1,sep1) -- TODO better default implementation
+    local sep, fields = sep or ":", {}
+    local pattern = string.format("([^%s]+)", sep)
+    string:gsub(pattern, function(c) fields[#fields+1] = c end)
+    return fields
+  end
+  
+  return split(string,sep)
+end
+
 --- List of naming rules.
 NGenLifeParams.namingRules = {}
 

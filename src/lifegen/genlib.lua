@@ -1,7 +1,7 @@
 -- Name generation tools
--- This is NOT an API, use NameGenLife from namegen
+-- TODO Figure out if I want to move everything from here to namegen...
 
-local function split(string,sep) -- Not really safe 
+local function split(string,sep)
   local sep, fields = sep or ":", {}
   local pattern = string.format("([^%s]+)", sep)
   string:gsub(pattern, function(c) fields[#fields+1] = c end)
@@ -40,10 +40,16 @@ local function parseRelationText(textArray) -- Parse partially text-form relatio
     name = name:gsub("+,","")
     rules[name] = ruleOptions
   end
+  
+  return rules
+end
+
+local function parseRelationTable(table) -- Parse relation table if needed
+  
 end
 
 local function checkPossibleRules(allRules)
-  for rule,options in allRules do
+  for rule,options in allRules do -- Check rules with * +separate or +everything
     
   end
 end
