@@ -1,8 +1,10 @@
 -- Generator parameters
 
+require "namegen"
+
 --- Namegen-life parameters.
 -- @type NgenLifeParams
-NGenLifeParams = {}
+local NGenLifeParams = {}
 
 function NGenLifeParams:new(o)
   o = o or {}
@@ -13,7 +15,7 @@ end
 
 --- Naming rule for namegen-life.
 -- @type LifeNamingRule
-LifeNamingRule = {}
+local LifeNamingRule = {}
 
 function LifeNamingRule:new(o)
   o = o or {}
@@ -67,18 +69,7 @@ LifeNamingRule.relations = {}
 LifeNamingRule.relations["*"] = {"+separate"}
 
 function LifeNamingRule:read(string)
-  local lines = self.split(string,"\n")
-end
-
-function LifeNamingRule.split(string,sep)
-  local function split(string1,sep1) -- TODO better default implementation
-    local sep, fields = sep or ":", {}
-    local pattern = string.format("([^%s]+)", sep)
-    string:gsub(pattern, function(c) fields[#fields+1] = c end)
-    return fields
-  end
-  
-  return split(string,sep)
+  local lines = NameGenLife.split(string,"\n")
 end
 
 --- List of naming rules.

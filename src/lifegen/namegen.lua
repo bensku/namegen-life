@@ -4,7 +4,7 @@ require "genparameters"
 
 --- Life name generator, which utilizes markov chain.
 -- @type NameGenLife
-NameGenLife = {}
+local NameGenLife = {}
 
 function NameGenLife:new(params,o)
   params = params or nil
@@ -27,3 +27,16 @@ function NameGenLife:createName(params)
   
   local rules = checkPossibleRules(params.namingRules)
 end
+
+function NameGenLife.split(string,sep)
+  local function split(string1,sep1) -- TODO better default implementation
+    local sep, fields = sep or ":", {}
+    local pattern = string.format("([^%s]+)", sep)
+    string:gsub(pattern, function(c) fields[#fields+1] = c end)
+    return fields
+  end
+  
+  return split(string,sep)
+end
+
+return NameGenLife

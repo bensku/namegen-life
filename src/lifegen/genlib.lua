@@ -10,6 +10,10 @@ end
 
 local function parseRelationText(textArray) -- Parse partially text-form relation data to lua table
   -- Quick and dirty... Split to multiple functions?
+  if type(textArray[1]) == "string" then
+    return textArray -- Array was in table-form already
+  end
+  
   local rules = {}
   
   for line,options in textArray do
@@ -35,22 +39,58 @@ local function parseRelationText(textArray) -- Parse partially text-form relatio
       end
     end
     
-    local name = stringTabe[1]
+    local name = stringTable[1]
     name = name:gsub("-","")
     name = name:gsub("+,","")
-    rules[name] = ruleOptions
+    rules[name] = ruleOptions -- E.g. rules["everything] = {} (no parameters)
   end
   
   return rules
 end
 
 local function parseRelationTable(table) -- Parse relation table if needed
+  local newTable = {}
+  for k,v in table do
+    for line,options in v.relations do
+      v.relations[line] = parseRelationText(options)
+    end
+    newTable[k] = v
+  end
   
+  return newTable
 end
 
-local function checkPossibleRules(allRules)
-  for rule,options in allRules do -- Check rules with * +separate or +everything
+local function sortByPriority(rules)
+  for k,v in pairs(rules) do -- TODO sort by priority
     
+  end
+end
+
+local function checkPossibleRules(rules)
+  local allRules = sortByPriority(parseRelationTable(rules))
+  
+  local permissiveRules = {}
+  local separateRules = {}
+  
+  for line,rule in ipairs(allRules) do
+    for group,options in rule.relations do -- Check rules with * +separate or +everything
+      local everythingOk = false -- TODO Remove and replace
+      local separateOk = false
+      if group == "*" then
+        for option,params in options do
+          if params.isPositive then
+           if option == "everything" then
+              everythingOk = true
+            else if option == "separate" then
+              separateOk = true
+            end
+          end
+        end
+        
+        if everythingOk then table.insert(permissiveRules, rule) end
+        if separateOk then table.insert(separateRules, rule) end
+      end
+    end
   end
 end
 
