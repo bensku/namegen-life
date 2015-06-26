@@ -48,11 +48,11 @@ local function parseRelationText(textArray) -- Parse partially text-form relatio
   return rules
 end
 
-local function parseRelationTable(table) -- Parse relation table if needed
+local function untextifyRelations(table) -- Parse relation table if needed
   local newTable = {}
-  for k,v in table do
-    for line,options in v.relations do
-      v.relations[line] = parseRelationText(options)
+  for k,v in pairs(table) do
+    for line,options in pairs(v) do
+      v[line] = parseRelationText(options)
     end
     newTable[k] = v
   end
@@ -60,38 +60,75 @@ local function parseRelationTable(table) -- Parse relation table if needed
   return newTable
 end
 
-local function sortByPriority(rules)
-  for k,v in pairs(rules) do -- TODO sort by priority
-    
+local function checkPriorityTable(priorityTable)
+  for rule,priority in pairs(priorityTable) do
+    assert(type(rule) == "string", "Rule name is not string!")
+    if type(priority) ~= "number" then
+      assert(false, "Rule priority is not number, fixing...")
+      priorityTable[rule] = 0
+    end
   end
 end
 
-local function checkPossibleRules(rules)
-  local allRules = sortByPriority(parseRelationTable(rules))
+local function checkPossibleRules(relationTable,priorityTable,context) -- Feed it with table (key=rule name,value=relations) and name part
+  local relations = untextifyRelations(relationTable) -- TODO This is WAY too messy; separate when ready
   
-  local permissiveRules = {}
-  local separateRules = {}
+  local blockedRules = {} -- Blocked rules
   
-  for line,rule in ipairs(allRules) do
-    for group,options in rule.relations do -- Check rules with * +separate or +everything
-      local everythingOk = false -- TODO Remove and replace
-      local separateOk = false
-      if group == "*" then
-        for option,params in options do
+  for name,rules in pairs(relations) do
+    local priority = priorityTable[name] -- Number, right?
+    local whitelist = {}
+    local localBlocked = {} -- Local blocked rules, copied to global ones after passing whitelist check
+    for group,options in pairs(rules) do
+      local otherPriority = priorityTable[group] -- TODO support * and ?
+      for option,params in pairs(options) do
+        if option == "everything" then
           if params.isPositive then
-           if option == "everything" then
-              everythingOk = true
-            else if option == "separate" then
-              separateOk = true
-            end
+            whitelist[group] = true
+          end
+          
+          if params.isPositive == false and priority < otherPriority then
+            if whitelist[group] ~= true then localBlocked[group] = true end
+          end
+        elseif option == "separate" and context == "same" then
+          if params.isPositive == false and priority < otherPriority then
+            if whitelist[group] ~= true then localBlocked[group] = true end
           end
         end
-        
-        if everythingOk then table.insert(permissiveRules, rule) end
-        if separateOk then table.insert(separateRules, rule) end
       end
     end
+    
+    for group,value in pairs(whitelist) do
+      if value then localBlocked[group] = false end
+    end
+    
+    for group,value in pairs(localBlocked) do
+      if value then blockedRules[group][name] = true end
+    end
   end
+  
+  for group,values in pairs(blockedRules) do -- Remove irrelevant blocks
+    local isValid = false -- Is block still valid
+    for value,bool in pairs(values) do
+      if group[value] ~= false then isValid = true end
+    end
+    
+    if isValid == false then blockedRules[group] = nil end -- Assign nil because may use less memory than false
+  end
+  
+  return blockedRules
+end
+
+local function getRelationTables(rules)
+  local relationTable = {}
+  local priorityTable = {}
+  
+  for line,rule in pairs(rules) do
+    relationTable[rule.name] = rule.relations
+    priorityTable[rule.name] = rule.priority
+  end
+  
+  return relationTable, priorityTable
 end
 
 local function createNamePart(params,part) -- Create name part (first/last name)

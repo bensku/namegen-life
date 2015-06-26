@@ -24,6 +24,9 @@ function LifeNamingRule:new(o)
   return o
 end
 
+--- Name of the rule. Should be same always.
+LifeNamingRule.name = "default"
+
 --- Patters of characters, each with it's own probability.
 -- Each entry of table is labeled with characters which it applies to (ex. "aa").
 -- It contains <i>another</i> table which has again entries specified by
