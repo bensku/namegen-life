@@ -1,6 +1,13 @@
 -- Name generation tools
 -- TODO Figure out if I want to move everything from here to namegen...
 
+require "genparameters"
+require "namegen"
+
+local genLib = {}
+
+genLib.tweaks = {}
+
 local function split(string,sep)
   local sep, fields = sep or ":", {}
   local pattern = string.format("([^%s]+)", sep)
@@ -10,7 +17,7 @@ end
 
 local function parseRelationText(textArray) -- Parse partially text-form relation data to lua table
   -- Quick and dirty... Split to multiple functions?
-  if type(textArray[1]) == "string" then
+  if type(textArray[1]) ~= "string" then
     return textArray -- Array was in table-form already
   end
   
@@ -40,13 +47,14 @@ local function parseRelationText(textArray) -- Parse partially text-form relatio
     end
     
     local name = stringTable[1]
-    name = name:gsub("-","")
-    name = name:gsub("+,","")
+    name = name:gsub("-", "")
+    name = name:gsub("+,", "")
     rules[name] = ruleOptions -- E.g. rules["everything] = {} (no parameters)
   end
   
   return rules
 end
+genLib.parseRelationText = parseRelationText
 
 local function untextifyRelations(table) -- Parse relation table if needed
   local newTable = {}
@@ -59,6 +67,7 @@ local function untextifyRelations(table) -- Parse relation table if needed
   
   return newTable
 end
+genLib.untextifyRelations = untextifyRelations
 
 local function checkPriorityTable(priorityTable)
   for rule,priority in pairs(priorityTable) do
@@ -69,8 +78,9 @@ local function checkPriorityTable(priorityTable)
     end
   end
 end
+genLib.checkPriorityTable = checkPriorityTable
 
-local function checkPossibleRules(relationTable,priorityTable,context) -- Feed it with table (key=rule name,value=relations) and name part
+local function checkPossibleRules(relationTable,priorityTable,context) -- Feed it with tables and context
   local relations = untextifyRelations(relationTable) -- TODO This is WAY too messy; separate when ready
   
   local blockedRules = {} -- Blocked rules
@@ -116,8 +126,9 @@ local function checkPossibleRules(relationTable,priorityTable,context) -- Feed i
     if isValid == false then blockedRules[group] = nil end -- Assign nil because may use less memory than false
   end
   
-  return blockedRules
+  return blockedRules -- Yes, returns rule names that are NOT possible
 end
+genLib.checkPossibleRules = checkPossibleRules
 
 local function getRelationTables(rules)
   local relationTable = {}
@@ -130,7 +141,49 @@ local function getRelationTables(rules)
   
   return relationTable, priorityTable
 end
+genLib.getRelationTables = getRelationTables
+
+local function removeBlockedRules(rules,blockedRules)
+  local newRules = {}
+  for line,rule in pairs(rules) do
+    if blockedRules[rule.name] == false then
+      table.insert(newRules,rules)
+    end
+  end
+  
+  return newRules
+end
+genLib.removeBlockedRules = removeBlockedRules
+
+local function parsePatterns(patterns)
+  for id,tweak in pairs(genLib.tweaks) do
+    local patternParsers = tweak.patternParsers
+    if patternParsers ~= {} then
+      for name,parser in pairs(patternParsers) do
+        patterns = parser(patterns) -- Hope that the parser didn't return nil
+      end
+    end
+  end
+end
+genLib.parsePatters = parsePatterns
 
 local function createNamePart(params,part) -- Create name part (first/last name)
+  local relationTable, priorityTable = getRelationTables(params.namingRules)
+  local blockedRules = checkPossibleRules(relationTable, priorityTable, "same") -- Names of blocked
+  
+  local rules = removeBlockedRules(params.namingRules,blockedRules)
+  local patterns = {}
+  
+  if rules[2] == nil then -- There is only one rule left... GOOD!
+    patterns = rules[1].patterns
+  else
+    error("Rule combining is not supported yet!") -- TODO rule combinations
+  end
+  
+  patterns = parsePatterns(patterns) -- Call for tweaks
+  
   
 end
+genLib.createNamePart = createNamePart
+
+return genLib
