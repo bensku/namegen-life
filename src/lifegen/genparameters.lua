@@ -32,7 +32,7 @@ LifeNamingRule.name = "default"
 -- It contains <i>another</i> table which has again entries specified by
 -- some characters. These entries contain probabilities for them to happen.
 -- 
--- Example: patterns = {aa = {ab = 0.1, ac = 0.2, ad = 0.3}, ab = {...}, ac = {...}}
+-- Example: patterns = aa = {ab = 0.1, ac = 0.2, ad = 0.3}, ab = {...}, ac = {...}}
 -- 
 -- The name generator iterates through the table, and generates random number
 -- with range of 0-1 for each entry. If the number is smaller than probability,

@@ -167,6 +167,55 @@ local function parsePatterns(patterns)
 end
 genLib.parsePatters = parsePatterns
 
+local function loopForNextPattern(available,random)
+  local accepted = {}
+  local rejected = {}
+  
+  for pattern,change in pairs(available) do
+    local rand = random() -- Random number between 0 and 1
+    
+    if rand <= change then
+      accepted[pattern] = change
+    else
+      rejected[pattern] = change
+    end
+  end
+  
+  return accepted,rejected
+end
+
+local function makeName(patterns,random,nameLenght)
+  local previous = "_start" -- previous pattern; at start, it is _start
+  local name = {}
+  
+  repeat
+    local available = {}
+    local ready = false
+    repeat
+      local accepted, rejected = loopForNextPattern(available,random)
+     
+      local counter = 0
+      local last = nil
+      for k,v in pairs(accepted) do
+        counter = counter + 1
+        last = k -- Key is the pattern, value is useless change for that
+      end
+      
+      if counter == 1 then
+        ready = true
+        name = table.insert(name,last)
+      end
+      
+      available = {}
+      for k,v in pairs(accepted) do
+        available[k] = v
+      end
+    until ready == true
+  until #name >= nameLenght -- Fallback to stop generation if nameLenght is exceeded... Just in case
+  
+  return table.concat(name)
+end
+
 local function createNamePart(params,part) -- Create name part (first/last name)
   local relationTable, priorityTable = getRelationTables(params.namingRules)
   local blockedRules = checkPossibleRules(relationTable, priorityTable, "same") -- Names of blocked
