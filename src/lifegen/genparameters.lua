@@ -24,6 +24,10 @@ function LifeNamingRule:new(o)
   return o
 end
 
+function NGenLifeParams:newRule()
+  return LifeNamingRule:new()
+end
+
 --- Name of the rule. Should be same always.
 LifeNamingRule.name = "default"
 
@@ -100,3 +104,5 @@ NGenLifeParams.chooseMethod = "preciseMatch"
 function NGenLifeParams:addRule(rule)
   table.insert(self.namingRules, rule)
 end
+
+return NGenLifeParams
