@@ -1,8 +1,10 @@
 -- Name generation tools
 -- TODO Figure out if I want to move everything from here to namegen...
+package.path = package.path .. ";src\\?;src\\?.lua"
 
-require "genparameters"
-require "namegen"
+
+--require "lifegen.genparameters"
+--require "lifegen.namegen"
 
 local genLib = {}
 
@@ -17,19 +19,19 @@ end
 
 local function parseRelationText(textArray) -- Parse partially text-form relation data to lua table
   -- Quick and dirty... Split to multiple functions?
-  if type(textArray[1]) ~= "string" then
+  if type(textArray[1]) == "string" then
     return textArray -- Array was in table-form already
   end
   
   local rules = {}
   
-  for line,options in textArray do
+  for line,options in pairs(textArray) do
     local ruleOptions = {}
     local firstPlus = options:find("+")
     local firstMinus = options:find("-")
     local spacesAtStart -- Spaces at start of the line
     
-    if firstPlus < firstMinus then -- Positive rule
+    if not firstMinus or firstPlus < firstMinus then -- Positive rule
       ruleOptions.isPositive = true
       spacesAtStart = firstPlus - 1
     else -- Negative rule
@@ -40,7 +42,7 @@ local function parseRelationText(textArray) -- Parse partially text-form relatio
     options = options:sub(spacesAtStart)
     local stringTable = split(options," ")
     
-    for k,v in stringTable do
+    for k,v in pairs(stringTable) do
       if k > 1 then
         table.insert(ruleOptions,v)
       end
@@ -48,7 +50,7 @@ local function parseRelationText(textArray) -- Parse partially text-form relatio
     
     local name = stringTable[1]
     name = name:gsub("-", "")
-    name = name:gsub("+,", "")
+    name = name:gsub("+", "")
     rules[name] = ruleOptions -- E.g. rules["everything] = {} (no parameters)
   end
   

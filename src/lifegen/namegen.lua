@@ -1,6 +1,7 @@
 -- Name generator
+package.path = package.path .. ";src\\?;src\\?.lua"
 
-require "genparameters"
+require "lifegen.genparameters"
 
 --- Life name generator, which utilizes markov chain.
 -- @type NameGenLife
@@ -15,7 +16,7 @@ function NameGenLife:new(params,o)
   return o
 end
 
-NameGenLife.params = NGenLifeParams:new()
+--NameGenLife.params = NGenLifeParams:new()
 
 --- Name generation library implementation.
 -- Replace this if you want to change behavior of name generator. Just
@@ -25,7 +26,7 @@ NameGenLife.params = NGenLifeParams:new()
 -- maximize performance.
 -- 
 -- Generally using tweaks breaks less things.
-NameGenLife.genLib = require "genlib"
+NameGenLife.genLib = require "lifegen.genlib"
 
 function NameGenLife:createName(params)
   params = params or self.params -- Assign params from self if not provided or nil

@@ -1,6 +1,8 @@
 -- Generator parameters
+package.path = package.path .. ";src\\?;src\\?.lua"
 
-require "namegen"
+-- TODO Windows crashes if I override imports... ?
+--require "lifegen.namegen"
 
 --- Namegen-life parameters.
 -- @type NgenLifeParams
@@ -77,6 +79,8 @@ LifeNamingRule.relations["*"] = {"+separate"}
 
 function LifeNamingRule:read(string)
   local lines = NameGenLife.split(string,"\n")
+  
+  
 end
 
 --- List of naming rules.
