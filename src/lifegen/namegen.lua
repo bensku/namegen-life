@@ -7,6 +7,14 @@ require "lifegen.genparameters"
 -- @type NameGenLife
 local NameGenLife = {}
 
+NameGenLife.isReady = false
+
+--- Initializes namegen-life.
+-- 
+function NameGenLife:initialize()
+  
+end
+
 function NameGenLife:new(params,o)
   params = params or nil
   o = o or {}
@@ -16,7 +24,7 @@ function NameGenLife:new(params,o)
   return o
 end
 
---NameGenLife.params = NGenLifeParams:new()
+NameGenLife.params = NGenLifeParams:new()
 
 --- Name generation library implementation.
 -- Replace this if you want to change behavior of name generator. Just

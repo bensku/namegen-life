@@ -1,8 +1,8 @@
 -- Generator parameters
 package.path = package.path .. ";src\\?;src\\?.lua"
 
--- TODO Windows crashes if I override imports... ?
---require "lifegen.namegen"
+-- TODO Windows Eclipse crashes if I override imports... ?
+-- require "lifegen.namegen"
 
 --- Namegen-life parameters.
 -- @type NgenLifeParams
@@ -24,10 +24,6 @@ function LifeNamingRule:new(o)
   setmetatable(o, self)
   self.__index = self
   return o
-end
-
-function NGenLifeParams:newRule()
-  return LifeNamingRule:new()
 end
 
 --- Name of the rule. Should be same always.
@@ -78,9 +74,19 @@ LifeNamingRule.relations = {}
 LifeNamingRule.relations["*"] = {"+separate"}
 
 function LifeNamingRule:read(string)
-  local lines = NameGenLife.split(string,"\n")
+  local split = NameGenLife.split
+  local lines = split(string,"\n")
   
+  local sections = {}
+  local currentSection = ""
   
+  for line,text in ipairs(lines) do
+    local parts = split(text," ")
+    
+    if parts[1] == "info" then
+      
+    end
+  end
 end
 
 --- List of naming rules.
@@ -109,4 +115,4 @@ function NGenLifeParams:addRule(rule)
   table.insert(self.namingRules, rule)
 end
 
-return NGenLifeParams
+return {NGenLifeParams, LifeNamingRule}

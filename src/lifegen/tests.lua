@@ -17,8 +17,12 @@ local function runTests(genlib)
     end
   end
   
-  s
+  
 end
 
 local genlib = require "lifegen.genlib"
 runTests(genlib)
+
+local NGenLifeParams, LifeNamingRule = unpack(require "lifegen.genparameters")
+print(type(NGenLifeParams))
+print(type(LifeNamingRule))
