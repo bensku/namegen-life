@@ -1,0 +1,22 @@
+!info
+author=bensku
+name=namegen-life test data
+desc=A set of test data for namegen-life.
+program=hand-made
+source=bensku
+website=https://github.com/bensku/namegen-life
+
+!pattern _start
+aa 0.9
+ab 0.1
+ac 0.5
+ad 0.4
+ae 0.6
+af 0.7
+ag 0.3
+
+!pattern aa
+ba 0.8
+bb 0.3
+bc 0.4
+bd 0.7

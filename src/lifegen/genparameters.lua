@@ -73,20 +73,49 @@ LifeNamingRule.priority = 0
 LifeNamingRule.relations = {}
 LifeNamingRule.relations["*"] = {"+separate"}
 
+--- Metadata for this rule.
+-- Metadata consists set of keys with string values. No keys are necessary, but
+-- few are recommended:
+-- <ul>
+-- <li>authors: authors of data (not necessarily source of it). Use , to separate
+-- multiple authors.
+-- <li>name: name of data
+-- <li>desc: description of datas
+-- <li>version: version of data (should be valid number)
+-- <li>program: program used to grab data from name list to patterns ("hand-made" if none is used)
+-- <li>source: source of name data
+-- <li>website: website url related to the file
+-- </ul>
+LifeNamingRule.metadata = {}
+
 function LifeNamingRule:read(string)
   local split = NameGenLife.split
   local lines = split(string,"\n")
   
   local sections = {}
+  local metadata = {}
   local currentSection = ""
   
   for line,text in ipairs(lines) do
-    local parts = split(text," ")
+    local parts = split(text, " ")
     
-    if parts[1] == "info" then
-      
+    if parts[1] == "!info" then
+      currentSection = "metadata"
+    elseif parts[1] == "!pattern" then
+      currentSection = parts[2]
+    else
+      if currentSection == "metadata" then
+        local options = split(text, "=")
+        metadata[options[1]] = options[2]
+      else
+        assert(type(parts[2]) ~= "number", "Name pattern change has to be number")
+        sections[currentSection][parts[1]] = tonumber(parts[2])
+      end
     end
   end
+  
+  self.patterns = sections
+  self.metadata = metadata
 end
 
 --- List of naming rules.
