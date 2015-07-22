@@ -2,19 +2,22 @@
 -- TODO Figure out if I want to move everything from here to namegen...
 package.path = package.path .. ";src\\?;src\\?.lua"
 
-
---require "lifegen.genparameters"
---require "lifegen.namegen"
-
 local genLib = {}
 
 genLib.tweaks = {}
 
-local function split(string,sep)
+local function splitFallback(string,sep)
   local sep, fields = sep or ":", {}
   local pattern = string.format("([^%s]+)", sep)
   string:gsub(pattern, function(c) fields[#fields+1] = c end)
   return fields
+end
+
+local split = nil
+if type(lifegenUtils) ~= "table" or type(lifegenUtils.split) ~= "function" then
+  split = splitFallback
+else
+  split = lifegenUtils.split
 end
 
 local function parseRelationText(textArray) -- Parse partially text-form relation data to lua table

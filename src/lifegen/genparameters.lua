@@ -1,8 +1,12 @@
 -- Generator parameters
 package.path = package.path .. ";src\\?;src\\?.lua"
 
--- TODO Windows Eclipse crashes if I override imports... ?
--- require "lifegen.namegen"
+local function splitFallback(string,sep)
+  local sep, fields = sep or ":", {}
+  local pattern = string.format("([^%s]+)", sep)
+  string:gsub(pattern, function(c) fields[#fields+1] = c end)
+  return fields
+end
 
 --- Namegen-life parameters.
 -- @type NgenLifeParams
@@ -89,7 +93,13 @@ LifeNamingRule.relations["*"] = {"+separate"}
 LifeNamingRule.metadata = {}
 
 function LifeNamingRule:read(string)
-  local split = NameGenLife.split
+  local split = nil
+  if type(lifegenUtils) ~= "table" or type(lifegenUtils.split) ~= "function" then
+    split = splitFallback
+  else
+    split = lifegenUtils.split
+  end
+  
   local lines = split(string,"\n")
   
   local sections = {}

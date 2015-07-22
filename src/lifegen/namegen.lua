@@ -1,19 +1,14 @@
 -- Name generator
 package.path = package.path .. ";src\\?;src\\?.lua"
 
-require "lifegen.genparameters"
+local NGenLifeParams, LifeNamingRule = unpack(require "lifegen.genparameters")
 
 --- Life name generator, which utilizes markov chain.
 -- @type NameGenLife
 local NameGenLife = {}
 
-NameGenLife.isReady = false
 
---- Initializes namegen-life.
--- 
-function NameGenLife:initialize()
-  
-end
+NameGenLife.isReady = false
 
 function NameGenLife:new(params,o)
   params = params or nil
@@ -22,6 +17,22 @@ function NameGenLife:new(params,o)
   self.__index = self
   self.params = params
   return o
+end
+
+--- Initializes namegen-life.
+-- Must be called before using it, otherwise it <i>may</i> not work correctly.
+function NameGenLife:initialize()
+  if lifegenUtils == nil then
+    lifegenUtils = {}
+  elseif type(lifegenUtils) ~= "table" then
+    error("Could not initialize lifegenUtils global, all functions try to fall back!")
+  end
+  
+  if lifegenUtils.split == nil then
+    lifegenUtils.split = self.split
+  end
+  
+  self.isReady = true
 end
 
 NameGenLife.params = NGenLifeParams:new()
@@ -39,7 +50,7 @@ NameGenLife.genLib = require "lifegen.genlib"
 function NameGenLife:createName(params)
   params = params or self.params -- Assign params from self if not provided or nil
   
-  local rules = checkPossibleRules(params.namingRules)
+  
 end
 
 --- Returns tweak tools for this name generator.
@@ -88,17 +99,6 @@ function NameGenLife:getTweakTools()
   function tweakTools:unregister()
     self.genLib.tweaks[self.id] = nil
   end
-end
-
-function NameGenLife.split(string,sep)
-  local function split(string1,sep1) -- TODO better default implementation
-    local sep, fields = sep or ":", {}
-    local pattern = string.format("([^%s]+)", sep)
-    string:gsub(pattern, function(c) fields[#fields+1] = c end)
-    return fields
-  end
-  
-  return split(string,sep)
 end
 
 return NameGenLife

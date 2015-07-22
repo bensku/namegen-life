@@ -2,7 +2,7 @@
 
 os.execute("cd")
 
-package.path = package.path .. ";src\\?;src\\?.lua"
+--package.path = package.path .. ";src\\?;src\\?.lua"
 
 local function runTests(genlib)
   -- Test relation text parser
@@ -18,6 +18,10 @@ local function runTests(genlib)
   end
   
   
+end
+
+local function testDataLoaders(lifeNamingRule)
+  lifeNamingRule:read()
 end
 
 local genlib = require "lifegen.genlib"
